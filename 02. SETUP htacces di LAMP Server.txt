@@ -1,0 +1,20 @@
+-----------------------------
+SETUP htacces di LAMP Server
+-----------------------------
+
+1# - Buka File Site Available domain atau website kita sebelumnya
+Lokasi : /etc/apache2/sites-available/s1.belajarserver.com.conf (contoh)
+
+2# - Tambahkan Script Berikut kedalam <Directory>
+
+Require all granted
+Options Indexes FollowSymLinks
+AllowOverride All
+
+3# - Restart Apache :
+sudo service apache2 restart
+
+4# - Enabled Mod_rewrite :
+sudo a2enmod rewrite
+
+5# - Buat file htaccess nya jika belum ada.

@@ -1,0 +1,122 @@
+-----------------------------
+Install LEMP Server
+-----------------------------
+
+1# - Install Nginx
+(Nginx = Engine X)
+
+-------------
+Update Dulu
+-------------
+sudo apt-get update
+sudo apt-get install nginx
+
+di Ubuntu 16, nginx dikonfigurasi untuk bisa running setelah installasi.
+Kita Setting dulu di Firewall, agar Nginx nya terkoneksi
+
+Command Enabled nya :
+sudo ufw allow 'Nginx HTTP'
+
+Cek Status nya :
+sudo ufw status
+
+
+2# - Install MySQL :
+
+sudo apt-get install mariadb-server mariadb-client
+
+Command untuk Start,Restart, atau STOP :
+sudo systemctl stop mysql.service
+sudo systemctl start mysql.service
+sudo systemctl enable mysql.service
+
+Kalau di Ubuntu 18 :
+sudo systemctl stop mariadb.service
+sudo systemctl start mariadb.service
+sudo systemctl enable mariadb.service
+
+Setting MySQL :
+sudo mysql_secure_installation
+
+Buat root password!
+
+3# - Install PHP Processor
+sudo apt install php-fpm php-common php-mbstring php-xmlrpc php-soap php-gd php-xml php-intl php-mysql php-cli php-zip php-curl
+
+Setting PHP Secure :
+sudo nano /etc/php/7.0/fpm/php.ini (versi bisa berbeda)
+
+cgi.fix_pathinfo < ubah detail nya
+
+Restart PHP : sudo systemctl restart php7.0-fpm
+
+
+4# - Setting NGINX :
+
+Buat dulu direktori untuk website kita :
+
+sudo mkdir -p /var/www/s1.belajarserver.com/html
+
+Berikan Hak Kepemilikan
+sudo chown -R www-data:www-data /var/www/s1.belajarserver.com/html
+
+Berikan Hak Akses :
+sudo chmod -R 755 /var/www
+
+buat sebuah file contoh :
+nano /var/www/s1.belajarserver.com/html/index.html
+
+isi :
+<html>
+    <head>
+        <title>Welcome to My Website !</title>
+    </head>
+    <body>
+        <h1>Success!  Website ini Berfungsi Normal !</h1>
+    </body>
+</html>
+
+
+Copy Settingan Default untuk Domain kita :
+sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/s1.belajarserver.com
+nano /etc/nginx/sites-available/s1.belajarserver.com
+cd /etc/nginx/sites-available
+rm s1.belajarserver.com < sesuaikan dengan yang kamu punya
+nano s1.belajarserver.com
+
+Contoh Isian nya begini :
+
+server {
+        listen 80;
+        listen [::]:80;
+
+        root /var/www/s1.belajarserver.com/html;
+        index index.php index.html index.htm index.nginx-debian.html;
+
+        server_name s1.belajarserver.com www.s1.belajarserver.com;
+
+        location / {
+                try_files $uri $uri/ /index.php?$args $uri/=404;
+        }
+
+        location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/run/php/php7.0-fpm.sock;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+}
+
+
+Kita Enable Virtual Host nya :
+
+sudo ln -s /etc/nginx/sites-available/s1.belajarserver.com /etc/nginx/sites-enabled/
+
+
+Test dulu ada error atau tidak :
+sudo nginx -t
+
+Restart Nginx
+sudo systemctl restart nginx.service

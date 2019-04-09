@@ -1,0 +1,177 @@
+------------------
+UPDATE DULU :
+------------------
+
+sudo apt update && sudo apt upgrade
+
+------------------
+Install Tasksel :
+------------------
+
+sudo apt install tasksel
+sudo tasksel install lamp-server
+
+------------------
+Install Apache :
+------------------
+
+sudo apt install apache2
+
+#Edit KeepAlive Supaya Server-side Memory Ringan
+#Lokasi /etc/apache2/apache2.conf
+
+nano /etc/apache2/apache2.conf
+
+KeepAlive On
+MaxKeepAliveRequests 50
+KeepAliveTimeout 5
+
+#Setting multi-processing module (MPM) Prefork
+#Lokasi /etc/apache2/mods-available/mpm_prefork.conf
+
+<IfModule mpm_prefork_module>
+        StartServers            4
+        MinSpareServers         3
+        MaxSpareServers         40
+        MaxRequestWorkers       200
+        MaxConnectionsPerChild  10000
+</IfModule>
+
+#Disable event Module, dan Aktifkan pefork
+
+sudo a2dismod mpm_event
+sudo a2enmod mpm_prefork
+
+#Restart Apache2 :
+sudo systemctl restart apache2
+
+------------------------------------
+Configure Virtual Host
+------------------------------------
+#Copy default Apache config file untuk website kita
+
+sudo cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/s1.belajarserver.com.conf
+
+#edit example.com dengan nama yang sudah kita buat
+#lokasi nya /etc/apache2/sites-available/s1.belajarserver.com.conf
+
+<Directory /var/www/html/s1.belajarserver.com/public_html>
+        Require all granted
+</Directory>
+<VirtualHost *:80>
+        ServerName s1.belajarserver.com
+        ServerAlias www.s1.belajarserver.com
+        ServerAdmin admin@belajarserver.com
+        DocumentRoot /var/www/html/s1.belajarserver.com/public_html
+
+        ErrorLog /var/www/html/s1.belajarserver.com/logs/error.log
+        CustomLog /var/www/html/s1.belajarserver.com/logs/access.log combined
+
+</VirtualHost>
+
+#Buat direktory seperti contoh berikut :
+sudo mkdir -p /var/www/html/s1.belajarserver.com/{public_html,logs}
+
+#hubungkan Virtual Host kita dari sites-available ke direktori site-enabled :
+sudo a2ensite s1.belajarserver.com.conf
+
+#disable default virtual host, untuk jaga-jaga :
+sudo a2dissite 000-default.conf
+
+#Kemudian Reload Apache :
+sudo systemctl reload apache2
+
+
+-----------------------
+Install MySql Server
+-----------------------
+
+sudo apt install mysql-server
+
+#Login ke mysql :
+mysql -u root -p
+
+#jika sebelumnya tidak ada password, atau kamu ingin merubah password
+#ketikkan perintah berikut ini :
+
+ALTER USER 'root'@'localhost' IDENTIFIED WITH 'mysql_password_baru' BY 'password';
+
+#buat database dan user sekalian hak akses ke database tersebut :
+
+CREATE DATABASE webdata;
+GRANT ALL ON webdata.* TO 'webuser' IDENTIFIED BY '123Password1';
+
+#exit :
+exit;
+
+---------------
+Install PHP 7
+---------------
+
+sudo apt install php7.0 libapache2-mod-php7.0 php7.0-mysql
+
+#Optional, install juga cURL, CGI, dan JSON support :
+
+sudo apt install php7.0-curl php7.0-json php7.0-cgi
+
+#Aktifkan Logs Error nya, biar mudah di cek nanti kalau ada masalah :
+#Lokasi nya disini : /etc/php/7.0/apache2/php.ini
+
+max_input_time = 30
+error_reporting = E_COMPILE_ERROR | E_RECOVERABLE_ERROR | E_ERROR | E_CORE_ERROR
+error_log = /var/log/php/error.log
+
+#Buat folder LOG php nya, dan berikan hak akses ownership ke Apache :
+
+sudo mkdir /var/log/php
+sudo chown www-data /var/log/php
+
+#Restart Apache
+
+sudo systemctl restart apache2
+
+
+-----------------
+TESTING
+-----------------
+
+#Trial dan Error dulu, apakah file php nya jalan, dan bisa konek ke Database,
+#Kita Buat Sample dulu:
+#Lokasi file disini : /var/www/html/s1.belajarserver.com/public_html/phptest.php
+
+#Contoh file nya :
+
+<html>
+<head>
+    <title>PHP Test</title>
+</head>
+    <body>
+    <?php echo '<p>Hello World</p>';
+
+    // In the variables section below, replace user and password with your own MySQL credentials as created on your server
+    $servername = "localhost";
+    $username = "webuser";
+    $password = "password";
+
+    // Create MySQL connection
+    $conn = mysqli_connect($servername, $username, $password);
+
+    // Check connection - if it fails, output will include the error message
+    if (!$conn) {
+        die('<p>Connection failed: <p>' . mysqli_connect_error());
+    }
+    echo '<p>Connected successfully</p>';
+    ?>
+</body>
+</html>
+
+
+----------------------------
+Jik ada masalah
+----------------------------
+
+#cek apakah Apache nya running atau tidak
+#Sebaiknya kita restart :
+
+systemctl status apache2
+sudo systemctl restart apache2
