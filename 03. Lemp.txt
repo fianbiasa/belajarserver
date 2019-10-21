@@ -46,7 +46,17 @@ sudo apt install php-fpm php-common php-mbstring php-xmlrpc php-soap php-gd php-
 Setting PHP Secure :
 sudo nano /etc/php/7.0/fpm/php.ini (versi bisa berbeda)
 
+kemudian cari file dibawah ini
 cgi.fix_pathinfo < ubah detail nya
+
+ketik CTRL+W (ini adalah fungsi search)
+edit tulisan cgi.fix_pathinfo menjadi 0
+contoh : cgi.fix_pathinfo=0
+
+kemudian save, dengan cara : CTRL+X , kemudian SHIFT+Y, kemudian ENTER
+
+
+
 
 Restart PHP : sudo systemctl restart php7.0-fpm
 
