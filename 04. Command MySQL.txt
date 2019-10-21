@@ -1,0 +1,29 @@
+Pertama Kita buat dulu Database nya :
+
+dan pastikan kita sedang berada di Terminal atau Aplikasi Putty
+(jika belum, silahkan buka aplikasi Terminal atau Putty)
+
+
+#1. Ketik mysql (untuk masuk ke dalam mysql mode)
+#2. buat database dengan mengetik perintah berikut :
+
+CREATE DATABASE nama_databasenya;
+
+(nama database bebas yah, silahkan di sesuaikan... pastikan di akhiri dengan titik koma)
+contoh :
+CREATE DATABASE websitesaya;
+
+artinya, kita sedang membuat database dengan nama websitesaya.
+
+#3. buat user untuk mengakses database tersebut, dengan perintah berikut :
+
+CREATE USER 'newuser'@'localhost' IDENTIFIED BY 'password';
+
+contoh :
+CREATE USER 'admin'@'localhost' IDENTIFIED BY '!@#PasswordSusah123';
+
+artinya, kita sedang membuat user dengan nama admin, dan password nya adalah !@#PasswordSusah123
+
+#4. berikan hak akses kepada user, supaya bisa mengakses DATABASE yang sudah kita buat.
+
+GRANT ALL PRIVILEGES ON * . * TO 'admin'@'localhost';
