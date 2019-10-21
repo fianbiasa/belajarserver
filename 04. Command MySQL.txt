@@ -27,3 +27,11 @@ artinya, kita sedang membuat user dengan nama admin, dan password nya adalah !@#
 #4. berikan hak akses kepada user, supaya bisa mengakses DATABASE yang sudah kita buat.
 
 GRANT ALL PRIVILEGES ON * . * TO 'admin'@'localhost';
+
+
+
+Lanjutkan proses Install website atau Wordpress anda.
+Selamat Praktek !!!
+
+Info lebih lengkap silahkan : https://www.belajarserver.com
+Support : support@belajarserver.com
